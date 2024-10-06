@@ -23,7 +23,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowForAnyClient",
-        builder => builder.AllowAnyOrigin()
+        builder => builder.WithOrigins("http://localhost:3000")
                           .AllowAnyHeader()
                           .AllowAnyMethod());
 });
@@ -42,4 +42,5 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseCors("AllowForAnyClient");
 app.Run();

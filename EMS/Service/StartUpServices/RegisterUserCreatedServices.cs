@@ -52,6 +52,7 @@ namespace EMS.Services.StartUpServices
             services.AddScoped<IRepository<TblUser>, UserRepository>();
             services.AddScoped<IUser, UserRepository>();
             services.AddScoped<IAuthentication, AuthenticationService>();
+            services.AddScoped<IRepository<TblEmployee>, EmployeeRepository>();
 
         }
     }

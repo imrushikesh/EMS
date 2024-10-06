@@ -29,13 +29,30 @@ namespace EMS.Controllers
             _configuration = configuration;
         }
 
+        [HttpGet, Route("GetAllUsers")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            try
+            {
+                _response.Result = await _userRepository.GetAllAsync();
+               
+            }
+            catch (Exception ex)
+            {
+                _response.Message = "Someting Went Wrong Try Again";
+                _response.IsSuccess = false;
+            }
+            return StatusCode((int)HttpStatusCode.OK, _response);
+        }
+
+
         [HttpGet, Route("GetUserById")]
         public async Task<IActionResult> GetUserById(int userId)
         {
             try
             {
                 var user = await _userRepository.GetByIdAsync(userId);
-                if (user == null)
+                if (user != null)
                 {
                     _response.Result = user;
                 }
@@ -58,7 +75,17 @@ namespace EMS.Controllers
         {
             try
             {
-                _userRepository.Delete(userId);
+                var existingUser = await _userRepository.GetByIdAsync(userId);
+                if (existingUser == null)
+                {
+                    _response.Message = "user Not Found";
+                }
+                else
+                {
+                    existingUser.Status = 0;
+                    TblUser user = _mapper.Map<TblUser>(existingUser);
+                    await _userRepository.Delete(user);
+                }
             }
             catch (Exception ex)
             {
@@ -90,8 +117,18 @@ namespace EMS.Controllers
         {
             try
             {
-                TblUser user = _mapper.Map<TblUser>(userDto);
-                _userRepository.Update(user);
+                var existingUser = await _userRepository.GetByIdAsync(userDto.UserId);
+                if (existingUser == null)
+                {
+                    _response.Message = "user Not Found";
+                }
+                else
+                {
+                    userDto.UserPassword = existingUser.UserPassword;
+                    userDto.Status = 1;
+                    TblUser user = _mapper.Map<TblUser>(userDto);
+                   await _userRepository.Update(user);
+                }
             }
             catch (Exception ex)
             {

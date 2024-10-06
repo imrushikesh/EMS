@@ -1,6 +1,7 @@
 using AutoMapper;
 using Azure;
 using EMS.Models;
+using EMS.Service;
 using EMS.Service.Interface;
 using EMS.Services.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
@@ -26,12 +27,29 @@ namespace EMS.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet, Route("GetEmployeeById")]
-        public async Task<IActionResult> GetEmployeeById(int userId)
+
+        [HttpGet, Route("GetAllEmployees")]
+        public async Task<IActionResult> GetAllEmployeeBys()
         {
             try
             {
-                _response.Result = await _empRepository.GetByIdAsync(userId);
+                _response.Result = await  _empRepository.GetAllAsync();
+            }
+            catch (Exception ex)
+            {
+                _response.Message = "Someting Went Wrong Try Again";
+                _response.IsSuccess = false;
+            }
+            return StatusCode((int)HttpStatusCode.OK, _response);
+        }
+
+
+        [HttpGet, Route("GetEmployeeById")]
+        public async Task<IActionResult> GetEmployeeById(int employeeId)
+        {
+            try
+            {
+                _response.Result = await _empRepository.GetByIdAsync(employeeId);
             }
             catch (Exception ex)
             {
@@ -42,16 +60,18 @@ namespace EMS.Controllers
         }
 
         [HttpDelete, Route("DeleteEmployee")]
-        public async Task<IActionResult> DeleteEmployee(int userId)
+        public async Task<IActionResult> DeleteEmployee(int employeeId)
         {
-            try
+            var existingEmp = await _empRepository.GetByIdAsync(employeeId);
+            if (existingEmp == null)
             {
-                _empRepository.Delete(userId);
+                _response.Message = "Employee Not Found";
             }
-            catch (Exception ex)
+            else
             {
-                _response.Message = "Someting Went Wrong Try Again";
-                _response.IsSuccess = false;
+                existingEmp.Status = 0;
+                TblEmployee emp = _mapper.Map<TblEmployee>(existingEmp);
+                await _empRepository.Delete(emp);
             }
             return StatusCode((int)HttpStatusCode.OK, _response);
         }
@@ -72,13 +92,13 @@ namespace EMS.Controllers
             return StatusCode((int)HttpStatusCode.OK, _response);
         }
 
-        [HttpPut, Route("UpdateUser")]
+        [HttpPut, Route("UpdateEmployee")]
         public async Task<IActionResult> Update(EmployeeDto empDto)
         {
             try
             {
                 TblEmployee emp = _mapper.Map<TblEmployee>(empDto);
-                _empRepository.Update(emp);
+               await _empRepository.Update(emp);
             }
             catch (Exception ex)
             {

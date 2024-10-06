@@ -12,12 +12,12 @@ namespace EMS.Models
         public int EmpId { get; set; }
 
         [Column("EMP_NAME", TypeName = "varchar(50)")]
-        public string? Name { get; set; }
+        public string? EmpName { get; set; }
         [Column("EMP_DEPARTMENT", TypeName = "varchar(50)")]
         public string? Department { get; set; }
 
         [Column("EMP_EMAIL", TypeName = "varchar(50)")]
-        public string? Email { get; set; }
+        public string? EmpEmail { get; set; }
         [Column("EMP_STATUS", TypeName = "int")]
         public int Status { get; set; }
     }

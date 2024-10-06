@@ -33,18 +33,17 @@ namespace EMS.Service
             await _context.SaveChangesAsync();
         }
 
-        public void Update(TblEmployee entity)
+        public async  Task  Update(TblEmployee entity)
         {
-            _context.Employees.Update(entity);
-            _context.SaveChanges();
+             _context.Employees.Update(entity);
+            await _context.SaveChangesAsync();
+
         }
 
-        public async void Delete(int id)
+        public async Task Delete(TblEmployee entity)
         {
-            TblEmployee emp = await GetByIdAsync(id);
-            emp.Status = 0;
-            _context.Employees.Update(emp);
-            _context.SaveChanges();
+            _context.Employees.Update(entity);
+           await _context.SaveChangesAsync();
         }
     }
 }

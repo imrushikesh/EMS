@@ -23,7 +23,7 @@ namespace EMS.Service
 
         public async Task<TblUser> GetByIdAsync(int id)
         {
-            return await _context.Users
+            return await _context.Users.AsNoTracking()
                 .FirstOrDefaultAsync(u => u.UserId == id && u.Status == 1);
         }
 
@@ -33,18 +33,16 @@ namespace EMS.Service
             await _context.SaveChangesAsync();
         }
 
-        public void Update(TblUser entity)
+        public async Task Update(TblUser entity)
         {
-            _context.Users.Update(entity);
-            _context.SaveChanges();
+             _context.Users.Update(entity);
+            await _context.SaveChangesAsync();
         }
 
-        public async void Delete(int id)
+        public async Task Delete(TblUser entity)
         {
-            TblUser user = await GetByIdAsync(id);
-            user.Status = 0;
-            _context.Users.Update(user);
-            _context.SaveChanges();
+            _context.Users.Update(entity);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<TblUser> GetByUsernameAsync(string username)
